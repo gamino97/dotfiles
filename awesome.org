@@ -370,47 +370,116 @@ screen.connect_signal("property::geometry", set_wallpaper)
 #+end_src
 
 ** Custom Widgets
-Keyboard map indicator and switcher
+*** Custom Powerline Widget
+#+begin_src lua
+local reversed_powerline = function(cr, width, height)
+     -- shape.transform(shape.powerline) : translate(5, 1) (cr,70,20)
+  gears.shape.powerline(cr, width, height, -height/2)
+end
+#+end_src
+
+*** Odd Powerline background
+#+begin_src lua
+local oddcolor =  "#4f76c7"
+local function oddpowerline(widget)
+    return wibox.widget {
+    {
+        {
+            widget = widget
+        },
+        widget = wibox.container.margin,
+        -- margins = 6
+        left = 10,
+        right = 10
+    },
+    bg = oddcolor,
+    fg = "#FFFFFF",
+    shape = reversed_powerline,
+    widget = wibox.container.background
+}
+end
+#+end_src
+
+*** Even Powerline Background
+#+begin_src lua
+local evencolor =  "#ab6500"
+local function evenpowerline(widget)
+    return wibox.widget {
+    {
+        {
+            widget = widget
+        },
+        widget = wibox.container.margin,
+        -- margins = 6
+        left = 9,
+        right = 9
+    },
+    bg = evencolor,
+    fg = "#FFFFFF",
+    shape = reversed_powerline,
+    widget = wibox.container.background
+}
+end
+#+end_src
+
+*** Keyboard map indicator and switcher
 #+begin_src lua
 -- mykeyboardlayout = awful.widget.keyboardlayout()
-mykeyboardlayout = wibox.widget {
+-- mykeyboardlayout =
+--     wibox.widget {
+--     {
+--         {
+--             widget = awful.widget.keyboardlayout()
+--         },
+--         widget = wibox.container.margin,
+--         margins = 5
+--         -- left = 6,
+--         -- right = 6
+--     },
+--     bg = "#FF0000",
+--     fg = "#FFFFFF",
+--     shape = reversed_powerline,
+--     widget = wibox.container.background
+-- }
+mykeyboardlayout = oddpowerline(awful.widget.keyboardlayout())
+#+end_src
+
+*** System Tray
+#+begin_src lua
+-- beautiful.bg_systray = "#FF0000"
+mysystray =
+    wibox.widget {
     {
-        widget = awful.widget.keyboardlayout()
+        widget = wibox.widget.systray()
+    },
+    bg = "#FF0000",
+    shape = gears.shape.powerline,
+    widget = wibox.container.background
+}
+mysystray = oddpowerline(wibox.widget.systray())
+#+end_src
+
+*** Textclock widget
+#+begin_src lua
+
+mytextclock = wibox.widget.textclock()
+mytextclock = wibox.widget {
+  {
+  {
+    widget = wibox.widget.textclock()
+
+  },
+        widget = wibox.container.margin,
+        margins = 5
+        -- left = 6,
+        -- right = 6
     },
     bg = "#FF0000",
     fg = "#FFFFFF",
     shape = gears.shape.powerline,
     widget = wibox.container.background,
 }
-#+end_src
-
-System Tray
-#+begin_src lua
-beautiful.bg_systray = "#FF0000"
-mysystray = wibox.widget {
-  {
-    widget = wibox.widget.systray(),
-  },
-    bg = "#FF0000",
-    shape = gears.shape.powerline,
-    widget = wibox.container.background,
-}
-#+end_src
-
-Create a textclock widget
-#+begin_src lua
-
-mytextclock = wibox.widget.textclock()
-mytextclock = wibox.widget {
-  {
-    widget = wibox.widget.textclock()
-
-  },
-    bg = "#FF0000",
-    fg = "#FFFFFF",
-    shape = gears.shape.powerline,
-    widget = wibox.container.background,
-}
+mytextclock = evenpowerline(wibox.widget.textclock())
 #+end_src
 
 ** Setup wibar
@@ -587,8 +656,10 @@ awful.screen.connect_for_each_screen(
                 -- Right widgets
                 mysystray,
                 layout = wibox.layout.fixed.horizontal,
+                spacing = -7,
                 wibox.widget.textbox("🌡"),
-                awful.widget.watch('bash -c "sensors | grep temp1 | awk \'{print $2}\'"', 5),
+                evenpowerline(awful.widget.watch('bash -c "sensors | grep temp1 | awk \'{print $2}\'"', 5)),
+                -- awful.widget.watch('bash -c "sensors | grep temp1 | awk \'{print $2}\'"', 5),
                     mykeyboardlayout,
                 mytextclock,
                 s.mylayoutbox
@@ -1018,7 +1089,7 @@ beautiful.border_width = 2
 beautiful.tasklist_bg_normal = colors[1]
 beautiful.tasklist_bg_focus = colors[1]
 beautiful.tasklist_shape_border_color_focus = colors[4]
-beautiful.bg_systray = colors[1]
+beautiful.bg_systray = oddcolor
 
 #+end_src
 
