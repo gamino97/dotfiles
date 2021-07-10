@@ -1,5 +1,5 @@
 #+TITLE: Rc Lua
-#+PROPERTY: header-args:lua :tangle ./dotfiles/.config/awesome/rc.lua
+#+PROPERTY: header-args:lua :tangle ./dotfiles/awesomewm/.config/awesome/rc.lua
 #+auto_tangle: t
 
 * TABLE OF CONTENTS :toc:
@@ -10,7 +10,7 @@
 - [[#menu][MENU]]
 - [[#wibar][WIBAR]]
   - [[#create-wibox][Create Wibox]]
-  - [[#set-wallpaper-with-pywal][SET WALLPAPER WITH PYWAL]]
+  - [[#set-wallpaper-with-pywal][Set Wallpaper with Pywal]]
   - [[#custom-widgets][Custom Widgets]]
   - [[#setup-wibar][Setup wibar]]
 - [[#mouse-bindings][MOUSE BINDINGS]]
@@ -49,18 +49,15 @@ Check if awesome encountered an error during startup and fell back to
 another config (This code will only ever execute for the fallback config)
 
 #+begin_src lua
-
 if awesome.startup_errors then
     naughty.notify({ preset = naughty.config.presets.critical,
                      title = "Oops, there were errors during startup!",
                      text = awesome.startup_errors })
 end
-
 #+end_src
 
 Handle runtime errors after startup
 #+begin_src lua
-
 do
     local in_error = false
     awesome.connect_signal("debug::error", function (err)
@@ -74,24 +71,20 @@ do
         in_error = false
     end)
 end
-
 #+end_src
 
 * VARIABLE DEFINITIONS
 Themes define colours, icons, font and wallpapers.
 #+begin_src lua
-
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
-
 #+end_src
 
 This is used later as the default terminal and editor to run.
 #+begin_src lua
-
-terminal = "x-terminal-emulator"
+-- terminal = "x-terminal-emulator"
+terminal = "gnome-terminal"
 editor = os.getenv("EDITOR") or "editor"
 editor_cmd = terminal .. " -e " .. editor
-
 #+end_src
 
 Default modkey.
@@ -100,14 +93,11 @@ If you do not like this or do not have such a key,
 I suggest you to remap Mod4 to another key using xmodmap or other tools.
 However, you can use another modifier like Mod1, but it may interact with others.
 #+begin_src lua
-
 modkey = "Mod4"
-
 #+end_src
 
 Table of layouts to cover with awful.layout.inc, order matters.
 #+begin_src lua
-
 awful.layout.layouts = {
     awful.layout.suit.tile,
     -- awful.layout.suit.floating,
@@ -126,12 +116,10 @@ awful.layout.layouts = {
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
 }
-
 #+end_src
 
 * HELPER FUNCTIONS
 #+begin_src lua
-
 local function client_menu_toggle_fn()
     local instance = nil
 
@@ -144,14 +132,12 @@ local function client_menu_toggle_fn()
         end
     end
 end
-
 #+end_src
 
 * MENU
 Create a launcher widget and a main menu
 
 #+begin_src lua
-
 myawesomemenu = {
    { "hotkeys", function() return false, hotkeys_popup.show_help end},
    { "manual", terminal .. " -e man awesome" },
@@ -178,17 +164,13 @@ else
     })
 end
 
-
 mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
-
 #+end_src
 
 Menubar configuration
 #+begin_src lua
-
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
-
 #+end_src
 
 * WIBAR
@@ -196,7 +178,6 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 ** Create Wibox
 Create a wibox for each screen and add it
 #+begin_src lua
-
 local taglist_buttons = gears.table.join(
                     awful.button({ }, 1, function(t) t:view_only() end),
                     awful.button({ modkey }, 1, function(t)
@@ -238,17 +219,14 @@ local tasklist_buttons = gears.table.join(
                      awful.button({ }, 5, function ()
                                               awful.client.focus.byidx(-1)
                                           end))
-
 #+end_src
 
-** SET WALLPAPER WITH PYWAL
+** Set Wallpaper with Pywal
 Define variables
 #+begin_src lua
-
 local cache = '/home/gamino/.cache/wal/colors'
 local images_directory = os.getenv("HOME") .."/Imágenes/Wallpapers/wallpapers/"
 local colors = {}
-
 #+end_src
 
 *** Code snippets
@@ -256,13 +234,11 @@ I get the following two snippets from [[http://lua-users.org/wiki/FileInputOutpu
 
 See if the file exists
 #+begin_src lua
-
 function file_exists(file)
   local f = io.open(file, "rb")
   if f then f:close() end
   return f ~= nil
 end
-
 #+end_src
 
 Get all lines from a file, returns an empty list/table if the file does not exist
@@ -276,16 +252,13 @@ function lines_from(file)
   end
   return lines
 end
-
 #+end_src
 
 Kind of strip python function
 #+begin_src lua
-
 function all_trim(s)
    return s:match( "^%s*(.-)%s*$" )
 end
-
 #+end_src
 
 LUA implementation of PHP scan dir
@@ -305,12 +278,10 @@ end
 
 Get Random file from files table
 #+begin_src lua
-
 function get_random_path(files_table, files_number)
   number = math.random(1, files_number)
   return files_table[number]
 end
-
 #+end_src
 
 *** Tests the functions above
@@ -340,16 +311,9 @@ end
 beautiful.wallpaper = get_random_wallpaper
 #+end_src
 
-Get colors table
-#+begin_src lua
-
-
-#+end_src
-
 *** Set Wallpaper
 
 #+begin_src lua
-
 local function set_wallpaper(s)
     -- Wallpaper
     if beautiful.wallpaper then
@@ -361,7 +325,6 @@ local function set_wallpaper(s)
         gears.wallpaper.maximized(wallpaper, s, true)
     end
 end
-
 #+end_src
 
 Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
@@ -485,7 +448,13 @@ awful.screen.connect_for_each_screen(
         set_wallpaper(s)
 
         -- Each screen has its own tag table.
-        awful.tag({"", "", "", "", "", "", "", "", ""}, s, awful.layout.layouts[1])
+        awful.tag({"", "", "", "", "", "", "", ""}, s, awful.layout.layouts[1])
+        awful.tag.add("", {
+                        gap                = 0,
+                        index = 2,
+                        layout = awful.layout.layouts[1],
+                        screen = s,
+        })
 
         -- Create a promptbox for each screen
         s.mypromptbox = awful.widget.prompt()
@@ -979,7 +948,6 @@ awful.rules.rules = {
 }
 
 #+end_src
--- }}}
 
 Set Firefox to always map on the tag named "2" on screen 1.
 { rule = { class = "Firefox" },
@@ -1068,7 +1036,6 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 
 * Beautify Theme
 #+begin_src lua
-
 beautiful.useless_gap = 4
 beautiful.border_normal = "#FF5733"
 beautiful.border_focus = "#5d99fd"
@@ -1077,28 +1044,24 @@ beautiful.tasklist_bg_normal = colors[1]
 beautiful.tasklist_bg_focus = colors[1]
 beautiful.tasklist_shape_border_color_focus = colors[4]
 beautiful.bg_systray = oddcolor
-
 #+end_src
 
 ** Set panel colors
 
 #+begin_src lua
-
 beautiful.wibar_bg = colors[1]
 beautiful.bg_normal = colors[1]
 beautiful.awesome_icon = "/home/gamino/.config/qtile/icons/mint.png"
-
 #+end_src
 
 * AUTOSTART APPLICATIONS
+Modify the ~/.xinitrc file
 #+begin_src lua
-
--- awful.spawn.once("./bashscripts/toggle_monitors.sh")
--- awful.spawn.with_shell("compton")
+awful.spawn.once("./bashscripts/toggle_monitors.sh")
+awful.spawn.once("compton")
 -- -- awful.spawn.single_instance("nitrogen --restore")
--- awful.spawn.single_instance("nm-applet")
--- awful.spawn.single_instance("/usr/bin/gnome-keyring-daemon --start --components=ssh")
--- awful.spawn.single_instance("/usr/bin/emacs --daemon")
--- awful.spawn.single_instance("xfce4-power-manager")
-
+awful.spawn.once("nm-applet")
+awful.spawn.once("/usr/bin/gnome-keyring-daemon --start --components=ssh")
+awful.spawn.once("/usr/bin/emacs --daemon")
+awful.spawn.once("xfce4-power-manager")
 #+end_src
