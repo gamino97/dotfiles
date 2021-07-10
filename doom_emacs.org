@@ -604,5 +604,5 @@ files begins.")
 ** Configurations
 #+begin_src emacs-lisp
 (file-relative-name "./dotfiles/awesomewm/.config/awesome/rc.lua" dotfiles-folder)
-(customize-set-variable 'dotfiles-org-files '("awesome.org" "doom_emacs.org"))
+(customize-set-variable 'dotfiles-org-files '("awesome.org" "doom_emacs.org" "fish.org"))
 #+end_src

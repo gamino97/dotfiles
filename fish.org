@@ -1,0 +1,119 @@
+#+TITLE: Fish Configuration
+#+PROPERTY: header-args:fish :tangle ./dotfiles/fish/.config/fish/config.fish
+#+auto_tangle: t
+
+* VENV
+This was for setup virtual environment management in shell
+# set WORKON_HOME $HOME/.virtualenvs
+# set VIRTUALENVWRAPPER_PYTHON /usr/bin/python3
+# set PROJECT_HOME $HOME/Devel
+# source /usr/local/bin/virtualenvwrapper.sh
+
+If you want to create a new virtual environment with a different Python interpreter, add the --python PYTHON_EXE (-p for brevity) flag to vf new, where PYTHON_EXE is any Python executable. For example:
+
+#vf new -p /usr/bin/python3 my_python3_env
+
+* MISCELLANEOUS
+
+#+begin_src fish
+set fish_greeting # This disables the welcome message.
+set TERM "xterm-256color"
+set VISUAL "emacsclient -c -a emacs"              # $VISUAL use Emacs in GUI mode
+#+end_src
+
+* ALIASES
+
+#+begin_src fish
+alias migracion="python manage.py makemigrations"
+alias migrar="python manage.py migrate"
+alias servidor="python manage.py runserver_plus --cert-file cert.crt --nopin"
+alias superusuario="python manage.py createsuperuser"
+alias checar="python manage.py check"
+alias proyecto="cd Documentos/Proyecto/editorial1"
+alias celery="celery -A editorial1 worker -l info"
+alias rasploc="cd ~/Documentos/Rasp32"
+alias raspboot="qemu-system-arm -kernel kernel-qemu-4.4.34-jessie -cpu arm1176 -m 256 -M versatilepb -serial stdio -append \"root=/dev/sda2 rootfstype=ext4 rw\" -hda 2017-04-10-raspbian-jessie.img -net user,hostfwd=tcp::5022-:22 -net nic -no-reboot"
+alias django_shell="python manage.py shell_plus --print-sql"
+alias disable_keyboard="xinput set-int-prop 13 \"Device Enabled\" 8 0"
+alias enable_keyboard="xinput set-int-prop 13 \"Device Enabled\" 8 1"
+alias ls="exa -a --icons --group-directories-first"
+alias ll="exa -la --icons --group-directories-first"
+alias killemacsd='emacsclient -e "(kill-emacs)"'
+alias startemacsd='emacs --daemon'
+alias update='sudo apt update'
+alias install='sudo apt install'
+#+end_src
+
+* EXPORTS
+echo "export PYTHONSTARTUP=~/.pythonrc" >> ~/.profile
+#+begin_src fish
+export PATH="~/ltx2any:$PATH"
+export PYTHONPATH="~/ltx2any:$PYTHONPATH"
+export secret_django="%luqiw$4-)u$x@gsu(3kry2yn###1v5bsmwr8wib3h5+mk75q9"
+export db_user="editorial_usuario"
+export db_pass="editorial_contraseña"
+export email_user="editorial.django@gmail.com"
+export email_pass="pefzweqmdwhwvfwe"
+export PATH="$HOME/.emacs.d/bin:$PATH"
+export PATH="$HOME/.local/bin/wal:$PATH"
+#+end_src
+
+* VTERM
+#+begin_src fish
+function vterm_printf;
+    if begin; [  -n "$TMUX" ]  ; and  string match -q -r "screen|tmux" "$TERM"; end
+        # tell tmux to pass the escape sequences through
+        printf "\ePtmux;\e\e]%s\007\e\\" "$argv"
+    else if string match -q -- "screen*" "$TERM"
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$argv"
+    else
+        printf "\e]%s\e\\" "$argv"
+    end
+end
+
+function vterm_prompt_end;
+    vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
+end
+
+functions --copy fish_prompt vterm_old_fish_prompt
+
+function fish_prompt --description 'Write out the prompt; do not replace this. Instead, put this at end of your file.'
+    # Remove the trailing newline from the original prompt. This is done
+    # using the string builtin from fish, but to make sure any escape codes
+    # are correctly interpreted, use %b for printf.
+    printf "%b" (string join "\n" (vterm_old_fish_prompt))
+    vterm_prompt_end
+end
+
+if [ "$INSIDE_EMACS" = 'vterm' ]
+    function clear
+        vterm_printf "51;Evterm-clear-scrollback";
+        tput clear;
+    end
+end
+
+function vterm_cmd --description 'Run an Emacs command among the ones been defined in vterm-eval-cmds.'
+    set -l vterm_elisp ()
+    for arg in $argv
+        set -a vterm_elisp (printf '"%s" ' (string replace -a -r '([\\\\"])' '\\\\\\\\$1' $arg))
+    end
+    vterm_printf '51;E'(string join '' $vterm_elisp)
+end
+
+function find_file
+    set -q argv[1]; or set argv[1] "."
+    vterm_cmd find-file (realpath "$argv")
+end
+
+function say
+    vterm_cmd message "%s" "$argv"
+end
+#+end_src
+
+# colorscript random
+
+* STARSHIP
+#+begin_src fish
+starship init fish | source
+#+end_src
