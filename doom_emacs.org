@@ -1,0 +1,608 @@
+#+TITLE: Doom Emacs Config
+#+PROPERTY: header-args:emacs-lisp :tangle ./dotfiles/doom_emacs/.doom.d/config.el
+#+auto_tangle: t
+
+* TABLE OF CONTENTS :toc:
+- [[#doom-emacs-configuration-file][Doom Emacs Configuration File]]
+- [[#identification][IDENTIFICATION]]
+- [[#fonts][FONTS]]
+  - [[#fira-code][Fira Code]]
+- [[#theme][THEME]]
+  - [[#transparency][Transparency]]
+- [[#org][ORG]]
+- [[#macros][MACROS]]
+- [[#misc][MISC]]
+- [[#auto-save][AUTO SAVE]]
+- [[#projects][PROJECTS]]
+- [[#formater][FORMATER]]
+  - [[#python][Python]]
+- [[#python-configurations][PYTHON CONFIGURATIONS]]
+  - [[#django][DJANGO]]
+  - [[#lsp][LSP]]
+  - [[#flycheck][Flycheck]]
+  - [[#python-mode][Python mode]]
+  - [[#evaluate-python-files][EVALUATE PYTHON FILES]]
+- [[#completition][COMPLETITION]]
+- [[#indent-guide][INDENT GUIDE]]
+- [[#vterm][VTERM]]
+- [[#hl-column-indicator][HL COLUMN INDICATOR]]
+- [[#treemacs][TREEMACS]]
+- [[#elfeed][ELFEED]]
+- [[#beacon][BEACON]]
+- [[#tree-sitter][TREE SITTER]]
+- [[#anaconda][ANACONDA]]
+- [[#evil][EVIL]]
+- [[#doom-modeline][DOOM MODELINE]]
+- [[#dash-docsets][Dash Docsets]]
+- [[#minions][Minions]]
+- [[#lua][LUA]]
+- [[#codigo-de-prueba-random][Codigo de prueba random]]
+- [[#uniquify-buffer-names][UNIQUIFY BUFFER NAMES]]
+- [[#dotcrafter][DOTCRAFTER]]
+  - [[#configurations][Configurations]]
+
+* Doom Emacs Configuration File
+Place your private configuration here! Remember, you do not need to run 'doom
+sync' after modifying this file!
+This configuration is for emacs in version 2.0.9 at March 26th, 2021
+
+* IDENTIFICATION
+Some functionality uses this to identify you, e.g. GPG configuration, email
+clients, file templates and snippets.
+
+#+begin_src emacs-lisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+(setq user-full-name "Carlos Gamino"
+      user-mail-address "carlos.gam55@outlook.com")
+#+end_src
+
+* FONTS
+Doom exposes five (optional) variables for controlling fonts in Doom. Here
+are the three important ones:
+
++ `doom-font'
++ `doom-variable-pitch-font'
++ `doom-big-font' -- used for `doom-big-font-mode'; use this for
+  presentations or streaming.
+
+They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+font string. You generally only need these two:
+(setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
+      doom-variable-pitch-font (font-spec :family "sans" :size 13))
+
+You can list all the font families using the shell, and typing:
+fc-list : family
+Additionally, you can use grep to filter the results
+
+#+begin_src emacs-lisp
+(setq doom-font (font-spec :family "Source Code Pro" :size 12))
+;; (after! doom-themes
+;;   (setq doom-themes-enable-bold t
+;;         doom-themes-enable-italic t))
+#+end_src
+
+This determines the style of line numbers in effect. If set to `nil', line
+numbers are disabled. For relative line numbers, set this to `relative'.
+
+#+begin_src emacs-lisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+** Fira Code
+This code enables the ligatures from FiraCode Nerd Font in Emacs, in other fonts the ligatures are bugged, so you can
+only use this mode with FiraCode, the family is: "FiraCode Nerd Font"
+In this link you can find instructions to install it:
+https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
+
+;; (use-package fira-code-mode
+;;   :custom (fira-code-mode-disabled-ligatures '("[]" "x"))  ; ligatures you don't want
+;;   :hook prog-mode)                                         ; mode to enable fira-code-mode in
+
+* THEME
+There are two ways to load a theme. Both assume the theme is installed and
+available. You can either set `doom-theme' or manually load a theme with the
+`load-theme' function. This is the default:
+(setq doom-theme 'doom-one)
+(add-to-list 'custom-theme-load-path "~/.doom.d/themes")
+
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-monokai-pro)
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic)
+  '(fixed-pitch :family "FiraCode Nerd Font")
+  )
+(custom-theme-set-faces! 'doom-monokai-pro
+  '(line-number :foreground "#555556")
+  '(sp-show-pair-match-face :background "#A6E22E" :foreground "#272822")
+  '(tree-sitter-hl-face:method.call :inherit tree-sitter-hl-face:method)
+  '(tree-sitter-hl-face:constant.builtin :inherit tree-sitter-hl-face:constant)
+  '(tree-sitter-hl-face:function.call :inherit tree-sitter-hl-face:function)
+  ;; '(org-block :background "#3E3D31")
+  )
+
+(after! doom-modeline ;; This solves doom-modeline issues
+  (doom-modeline-def-modeline 'main
+    '(bar matches buffer-info remote-host buffer-position parrot selection-info)
+    '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs "  "))) ; <-- added padding here
+(setq doom-modeline-window-width-limit fill-column)
+#+end_src
+
+** Transparency
+Set frame transparency
+;; (set-frame-parameter (selected-frame) 'alpha '(87 . 87))
+;; (add-to-list 'default-frame-alist '(alpha . (87 . 87)))
+
+* ORG
+If you use `org' and don't want your org files in the default location below,
+change `org-directory'. It must be set before org loads!
+
+#+begin_src emacs-lisp
+(after! org
+  (setq org-directory "~/Documentos/org/")
+  (setq org-log-done 'time))
+(add-hook! org-mode
+    (display-line-numbers-mode -1)
+    (show-smartparens-mode 1)
+    )
+#+end_src
+
+I don't want autocompletition in ORG mode
+
+#+begin_src emacs-lisp
+;; (defun zz/adjust-org-company-backends ()
+;;   (remove-hook 'after-change-major-mode-hook '+company-init-backends-h)
+;;   (setq-local company-backends nil))
+;; (add-hook! org-mode (zz/adjust-org-company-backends))
+#+end_src
+
+This code is also great, it uses org-babel-tangle automatically when you put
+"#+auto_tangle: t"
+in your org files.
+It requires the package org-auto-tangle
+
+#+begin_src emacs-lisp
+(require 'org-auto-tangle)
+(add-hook 'org-mode-hook 'org-auto-tangle-mode)
+#+end_src
+
+* MACROS
+Here are some additional functions/macros that could help you configure Doom:
+
+- `load!' for loading external *.el files relative to this one
+- `use-package!' for configuring packages
+- `after!' for running code after a package has loaded
+- `add-load-path!' for adding directories to the `load-path', relative to
+  this file. Emacs searches the `load-path' when you load packages with
+  `require' or `use-package'.
+- `map!' for binding new keys
+- `setq-hook! Convenience macro for setting buffer-local variables in a hook.
+
+To get information about any of these functions/macros, move the cursor over
+the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+This will open documentation for it, including demos of how they are used.
+
+You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+they are implemented.
+
+* MISC
+Miscellaneous changes.
+
+#+begin_src emacs-lisp
+;;(setq-default rainbow-delimiters-mode t)
+;;(setq-default tab-width 4)
+;;(setq indent-line-function 'insert-tab)
+(setq scroll-margin 8)
+;; (add-to-list 'initial-frame-alist '(fullscreen . maximized)) ;; Maximices Emacs
+#+end_src
+
+* AUTO SAVE
+This code enables auto save and backups.
+#+begin_src emacs-lisp
+(setq auto-save-default t
+      make-backup-files t)
+#+end_src
+
+* PROJECTS
+In this secction, we add the folders projects, using:
+(projectile-add-known-project "PATH")
+
+#+begin_src emacs-lisp
+;;(projectile-add-known-project "~/Documentos/Hardware")
+;;(projectile-add-known-project "~/Documentos/Topicos Mapas")
+(use-package! projectile
+  :custom
+  (projectile-auto-discover nil)
+  :config
+  (setq projectile-add-known-project '("~/Documentos/Hardware/" "~/Documentos/Topicos Mapas" "~/Documentos/Tesis/")))
+#+end_src
+
+* FORMATER
+** Python
+This setting creates a formatter called pep8.
+#+begin_src emacs-lisp
+(set-formatter! 'pep8 "autopep8 --max-line-length 119 --ignore errors -")
+#+end_src
+
+* PYTHON CONFIGURATIONS
+Configuration for Python mode, flycheck, etc.
+
+** DJANGO
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/home/gamino/python-django.el")
+(require 'python-django)
+#+end_src
+
+** LSP
+
+#+begin_src emacs-lisp
+;; (after! flycheck
+;;     (add-hook 'pyhon-mode-local-vars-hook
+;;             (lambda ()
+;;                 (when (flycheck-may-enable-checker 'python-flake8)
+;;                 (flycheck-select-checker 'python-flake8)))))
+;;   )
+#+end_src
+
+Increase bytes read from subprocess
+This is used with Doom Emacs
+#+begin_src emacs-lisp
+;; (setq read-process-output-max (* 1024 1024))
+#+end_src
+
+** Flycheck
+This section configurates the flycheck package included in Emacs Python
+
+#+begin_src emacs-lisp
+(use-package! flycheck
+  :hook (python-mode . flycheck-mode)
+  :config
+  (setq-default flycheck-disabled-checkers '(python-pylint))
+  (setq-default flycheck-enabled-checkers '(python-flake8))
+  (setq-default flycheck-flake8-maximum-line-length 119)
+  (setq-default flycheck-check-syntax-automatically '(mode-enabled save)))
+;; (after! flycheck
+;;   (global-flycheck-mode -1))
+;;(require 'flycheck)
+#+end_src
+
+*** Disable Flycheck
+This section disables flycheck for program modes.
+#+begin_src emacs-lisp
+(defun disable-flycheck-mode ()
+  (flycheck-mode -1))
+(add-hook 'prog-mode-hook 'disable-flycheck-mode)
+(add-hook 'org-mode-hook 'disable-flycheck-mode)
+#+end_src
+
+** Python mode
+This section configurates the python mode
+
+#+begin_src emacs-lisp
+(defun enable2-flycheck-mode ()
+  (flycheck-mode 't))
+(defun restart-rainbow-delimiters ()
+  (interactive)
+  (rainbow-delimiters-mode -1)
+  (rainbow-delimiters-mode 't))
+(add-hook! python-mode
+  (setq python-shell-interpreter-args "-u -i")
+  (show-smartparens-mode)
+  (show-paren-mode -1)
+  (restart-rainbow-delimiters)
+  ;; (enable2-flycheck-mode)
+  (setq +format-with 'pep8)
+  (display-fill-column-indicator-mode 't)
+  (flycheck-select-checker 'python-flake8)
+  (setq lsp-modeline-diagnostics-enable nil) ;; Disable Modeline diagnostics statistics
+  )
+
+(use-package! lsp
+  :config
+  (setq lsp-diagnostics-disabled-modes (list 'python-mode))
+  )
+#+end_src
+
+*** Check errors with Projectile
+
+#+begin_src emacs-lisp
+
+(defun gam/pylint-buffer ()
+  "Use the command Pylint in the current buffer using Django Plugin"
+  (interactive)
+  (when (eql major-mode 'python-mode)
+    (if (projectile-project-root)
+        (let ((default-directory (projectile-project-root)))
+          (python-check (format "pylint %s" (file-relative-name (buffer-file-name) (projectile-project-root))))
+          )
+      (message "You are not in a projectile project")
+      )
+    )
+  )
+#+end_src
+Backends for company in Org:
+(company-capf
+ (:separate company-dabbrev company-yasnippet company-ispell))
+
+ (company-capf company-yasnippet)
+
+** EVALUATE PYTHON FILES
+With this code we create a function that send the current Python buffer and prints a message when the execution is
+finished.
+#+begin_src emacs-lisp
+(defun send-python-file ()
+  "Send Python Buffer to Python Shell and print a final message"
+  (interactive)
+  (run-python)
+  (sleep-for 1)
+  (python-shell-send-string "print(\"*****-----EXECUTION STARTED-----*****\")")
+  (python-shell-send-buffer)
+  (python-shell-send-string "print(\"*****-----EXECUTION FINISHED-----*****\")")
+  (python-shell-send-string "exit()"))
+#+end_src
+
+With this code we map that function to the original map function python-shell-send-buffer
+#+begin_src emacs-lisp
+(map! :map python-mode-map
+      :desc "Send Python Buffer to Python Shell and print a final message" "C-c C-c" 'send-python-file)
+#+end_src
+
+* COMPLETITION
+This configuration changes the time between a user types something and the autocompletition suggest a word.
+
+#+begin_src emacs-lisp
+(setq company-idle-delay 0.0
+      company-minimum-prefix-length 2
+      company-show-numbers 't)
+#+end_src
+
+* INDENT GUIDE
+This package helps with highlight indentations.
+
+;; (after! highlight-indent-guides
+;;   (highlight-indent-guides-auto-set-faces))
+
+* VTERM
+You can follow installation instructions on [[https://github.com/akermu/emacs-libvterm][this config]]
+
+#+begin_src emacs-lisp
+(use-package! vterm
+  :load-path  "~/emacs-libvterm/"
+  :custom
+  (vterm-shell "/usr/bin/fish")
+  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
+
+(add-hook 'vterm-mode-hook
+          (lambda ()
+            (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+                 (buffer-face-mode t)))
+#+end_src
+
+* HL COLUMN INDICATOR
+We can change the numer of columns that the ruler will use
+
+#+begin_src emacs-lisp
+(setq-default fill-column 119)
+#+end_src
+
+* TREEMACS
+In this code, we enable nicer icons.
+
+#+begin_src emacs-lisp
+(setq doom-themes-treemacs-theme "doom-colors")
+#+end_src
+
+* ELFEED
+ELFEED is a RSS Reader.
+
+;; (require 'elfeed-goodies)
+;; (elfeed-goodies/setup)
+;; (setq elfeed-feeds (quote (
+;;                            ("https://www.elespanol.com/rss/elandroidelibre/")
+;;                            ("https://www.elespanol.com/rss/omicrono/")
+;;                            )))
+
+* BEACON
+Beacon is a package that blinks the cursor when you do faster movements, like go to the end of a buffer, move a certain
+number of lines, etc.
+
+;;(setq beacon-color "#ff0000")
+;;(beacon-mode 1)
+
+
+* TREE SITTER
+Activate Tree Sitter
+
+#+begin_src emacs-lisp
+(use-package! tree-sitter
+  :config
+  (require 'tree-sitter-langs)
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+#+end_src
+
+* ANACONDA
+Anaconda has an issue that opens too many servers, and doesn't work, this code solves the problem.
+
+#+begin_src emacs-lisp
+(remove-hook 'anaconda-mode-response-read-fail-hook
+'anaconda-mode-show-unreadable-response)
+
+#+end_src
+
+* EVIL
+Go to insert mode in Vterm
+
+#+begin_src emacs-lisp
+(use-package! evil
+  :config
+  (evil-set-initial-state 'vterm-mode 'insert)
+  (setq +evil-want-o/O-to-continue-comments nil)
+  )
+#+end_src
+
+* DOOM MODELINE
+#+begin_src emacs-lisp
+(setq doom-modeline-major-mode-icon t)
+(setq doom-modeline-modal-icon 'nil)
+#+end_src
+
+* Dash Docsets
+#+begin_src emacs-lisp
+(setq dash-docs-common-docsets '("Django"))
+(setq dash-docs-browser-func 'eww)
+#+end_src
+
+* Minions
+
+#+begin_src emacs-lisp
+(use-package! minions
+  :config
+  (minions-mode 1))
+#+end_src
+
+* LUA
+
+#+begin_src emacs-lisp
+(use-package! lua-mode
+  :config
+  (set-company-backend! 'lua-mode '(company-lua company-yasnippet company-files company-keywords company-capf company-dabbrev-code company-etags company-dabbrev))
+  )
+#+end_src
+
+* Codigo de prueba random
+
+#+begin_src emacs-lisp
+(defun gam/random-comida ()
+  (interactive)
+  (let ((output-files '())
+        (current-match t))
+    (save-excursion
+      (goto-char (point-min))  ;; Or (beginning-of-buffer)
+      (while current-match
+        (setq current-match (search-forward "+ [ ]" nil t))
+        (when current-match
+          (let ((output-file (thing-at-point 'line t)))
+            ;; If a file path was found, add it to the list
+            (setq output-files (cons (elt (split-string output-file "] ") 1)
+                                     output-files))))))
+    (message "%s" output-files)
+    (message "%s" (length output-files))
+    (message "%s" (elt output-files (random (- (length output-files) 1))))
+    ))
+#+end_src
+
+* UNIQUIFY BUFFER NAMES
+When several buffers visit identically-named files, Emacs must give the buffers distinct names. The default method adds a suffix based on the names of the directories that contain the files.
+You can see more information [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Uniquify.html][here]]
+#+begin_src emacs-lisp
+(customize-set-variable 'uniquify-buffer-name-style 'forward)
+#+end_src
+
+* DOTCRAFTER
+This is a project from daviwil for automatically handle dotfiles written in org-mode files
+
+#+begin_src emacs-lisp
+(defcustom dotfiles-folder "~/.dotfiles"
+  "The folder where dotfiles and org-mode configuration files are stored."
+  :type 'string
+  :group 'dotfiles)
+
+(defcustom dotfiles-org-files '()
+  "The list of org-mode files under the `dotfiles-folder' which
+contain configuration files that should be tangled"
+  :type '(list string)
+  :group 'dotfiles)
+
+(defun dotfiles-tangle-org-file (&optional org-file)
+  "Tangles a single .org file relative to the path in
+dotfiles-folder.  If no file is specified, tangle the current
+file if it is an org-mode buffer inside of dotfiles-folder."
+  (interactive)
+ ;; Suppress prompts and messages
+  (let ((org-confirm-babel-evaluate nil)
+        (message-log-max nil)
+        (inhibit-message t))
+    (org-babel-tangle-file (expand-file-name org-file dotfiles-folder))))
+
+(defun dotfiles-tangle-org-files ()
+  "Tangles all of the .org files in the paths specified by the variable dotfiles-folder"
+  (interactive)
+  (dolist (org-file dotfiles-org-files)
+    (dotfiles-tangle-org-file org-file))
+  (message "Dotfiles are up to date!"))
+#+end_src
+
+[[https://github.com/daviwil/emacs-from-scratch/blob/master/show-notes/Emacs-Lisp-05.org][Tutorial]]:
+#+begin_src emacs-lisp
+(defvar dotcrafter-gitignore-marker "\n# -- Generated by dotcrafter.el! --\n\n"
+  "The marker string to be placed in the .gitignore file of the
+dotfiles repo to indicate where the auto-generated list of ignored
+files begins.")
+
+(defun dotcrafter--scan-for-output-files (org-file)
+  (let ((output-files '())
+        (current-match t))
+    ;; Get a buffer for the file, either one that is
+    ;; already open or open a new one
+    (with-current-buffer (or (get-file-buffer org-file)
+                             (find-file-noselect org-file))
+      ;; Save the current buffer position
+      (save-excursion
+        ;; Go back to the beginning of the buffer
+        (goto-char (point-min))
+
+        ;; Loop until no more matches are found
+        (while current-match
+          ;; Search for blocks with a ":tangle" property
+          (setq current-match (search-forward ":tangle " nil t))
+          (when current-match
+            (let ((output-file (thing-at-point 'filename t)))
+              ;; If a file path was found, add it to the list
+              (unless (or (not output-file)
+                          (string-equal output-file "no"))
+                (setq output-files (cons output-file
+                                         output-files))))))))
+    output-files))
+
+(defun dotcrafter--update-gitignore ()
+  (interactive)
+  (let ((output-files '()))
+    ;; Gather the list of output files from all Org files
+    (dolist (org-file dotfiles-org-files)
+      (setq output-files
+            (append output-files
+                    (dotcrafter--scan-for-output-files
+                     (expand-file-name org-file dotfiles-folder)))))
+
+    ;; Now that we have the output files, update the .gitignore file
+    (let ((gitignore-file (expand-file-name ".gitignore"
+                                            dotfiles-folder)))
+      ;; Find the .gitignore buffer and prepare for editing
+      (with-current-buffer (or (get-file-buffer gitignore-file)
+                               (find-file-noselect gitignore-file))
+        (save-excursion
+          ;; Find or insert the dotcrafter-gitignore-marker
+          (beginning-of-buffer)
+          (or (progn
+                (search-forward dotcrafter-gitignore-marker nil t))
+              (progn
+                (end-of-buffer)
+                (insert "\n" dotcrafter-gitignore-marker)))
+
+          ;; Delete the rest of the buffer after the marker
+          (delete-region (point) (point-max))
+
+          ;; Insert a line for each output file
+          (dolist (output-file output-files)
+            (insert (file-relative-name output-file dotfiles-folder) "\n"))
+
+          ;; Make sure the buffer is saved
+          (save-buffer))))))
+#+end_src
+
+** Configurations
+#+begin_src emacs-lisp
+(file-relative-name "./dotfiles/awesomewm/.config/awesome/rc.lua" dotfiles-folder)
+(customize-set-variable 'dotfiles-org-files '("awesome.org" "doom_emacs.org"))
+#+end_src

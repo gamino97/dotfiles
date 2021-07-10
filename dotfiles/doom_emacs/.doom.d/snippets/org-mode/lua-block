@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: lua-block
+# uuid:
+# key: <sl
+# condition: t
+# --
+#+begin_src lua
+
+$0
+
+#+end_src
