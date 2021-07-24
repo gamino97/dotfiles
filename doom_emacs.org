@@ -10,6 +10,7 @@
 - [[#theme][THEME]]
   - [[#transparency][Transparency]]
 - [[#org][ORG]]
+  - [[#block-templates][Block templates]]
 - [[#macros][MACROS]]
 - [[#misc][MISC]]
 - [[#auto-save][AUTO SAVE]]
@@ -139,6 +140,7 @@ change `org-directory'. It must be set before org loads!
 #+begin_src emacs-lisp
 (after! org
   (setq org-directory "~/Documentos/org/")
+  (setq org-startup-folded 'overview)
   (setq org-log-done 'time))
 (add-hook! org-mode
     (display-line-numbers-mode -1)
@@ -163,6 +165,13 @@ It requires the package org-auto-tangle
 #+begin_src emacs-lisp
 (require 'org-auto-tangle)
 (add-hook 'org-mode-hook 'org-auto-tangle-mode)
+#+end_src
+
+** Block templates
+Add <p for python expansion
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("p" . "src python"))
+(add-to-list 'org-structure-template-alist '("sq" . "src sql"))
 #+end_src
 
 * MACROS
@@ -210,10 +219,14 @@ In this secction, we add the folders projects, using:
 ;;(projectile-add-known-project "~/Documentos/Hardware")
 ;;(projectile-add-known-project "~/Documentos/Topicos Mapas")
 (use-package! projectile
-  :custom
-  (projectile-auto-discover nil)
   :config
-  (setq projectile-add-known-project '("~/Documentos/Hardware/" "~/Documentos/Topicos Mapas" "~/Documentos/Tesis/")))
+  (projectile-register-project-type 'python '("manage.py")
+                                    :project-file "manage.py"
+				    :compile "python manage.py shell"
+				    :test "npm test"
+				    :run "python manage.py runserver"))
+;; :config
+;; (projectile-add-known-project '("~/Documentos/Hardware/" "~/Documentos/Topicos Mapas" "~/Documentos/Tesis/")))
 #+end_src
 
 * FORMATER
@@ -409,7 +422,6 @@ number of lines, etc.
 ;;(setq beacon-color "#ff0000")
 ;;(beacon-mode 1)
 
-
 * TREE SITTER
 Activate Tree Sitter
 
@@ -603,6 +615,6 @@ files begins.")
 
 ** Configurations
 #+begin_src emacs-lisp
-(file-relative-name "./dotfiles/awesomewm/.config/awesome/rc.lua" dotfiles-folder)
+;; (file-relative-name "./dotfiles/awesomewm/.config/awesome/rc.lua" dotfiles-folder)
 (customize-set-variable 'dotfiles-org-files '("awesome.org" "doom_emacs.org" "fish.org"))
 #+end_src
