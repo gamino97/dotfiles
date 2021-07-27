@@ -60,3 +60,4 @@
 (package! counsel-dash) ;; This is from Dash docs in MAC
 (package! minions)
 (package! vdiff)
+(package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))

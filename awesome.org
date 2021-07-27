@@ -437,7 +437,7 @@ end
 
 *** Textclock widget
 #+begin_src lua
-mytextclock = oddpowerline(wibox.widget.textclock())
+mytextclock = oddpowerline(wibox.widget.textclock(" %a %b %d %I:%M %p", 60, "America/Mexico_City"))
 #+end_src
 
 ** Setup wibar
@@ -865,17 +865,20 @@ Press Escape to cancel
 #+begin_src lua
 
 local function parse(_, stop_key, _, sequence)
+    text_n = "Cancelled"
     if stop_key == 'e' then
         awful.util.spawn("emacsclient -c -a 'emacs'")
+        text_n = "Launching Emacs"
     elseif stop_key == 'b' then
         awful.util.spawn("brave-browser-stable")
+        text_n = "Launching Brave"
     elseif stop_key == 'd' then
         awful.util.spawn("./bashscripts/toggle_monitors.sh")
     elseif stop_key == 'f' then
         awful.util.spawn("pcmanfm")
-    else
-        naughty.notify {text = "Cancelled", title = "Application Launcher"}
+        text_n = "Launching PCMANFM"
     end
+        naughty.notify {text = text_n, title = "Application Launcher"}
     return
 end
 local a = awful.keygrabber {
@@ -945,6 +948,12 @@ awful.rules.rules = {
     { rule_any = {type = { "normal", "dialog" }
       }, properties = { titlebars_enabled = false }
     },
+    { rule_any ={
+        class = {
+          "Foxit Reader"
+        }
+    }, properties = { tag = "" }}
+
 }
 
 #+end_src
@@ -1057,11 +1066,11 @@ beautiful.awesome_icon = "/home/gamino/.config/qtile/icons/mint.png"
 * AUTOSTART APPLICATIONS
 Modify the ~/.xinitrc file
 #+begin_src lua
-awful.spawn.once("./bashscripts/toggle_monitors.sh")
-awful.spawn.once("compton")
--- -- awful.spawn.single_instance("nitrogen --restore")
-awful.spawn.once("nm-applet")
-awful.spawn.once("/usr/bin/gnome-keyring-daemon --start --components=ssh")
-awful.spawn.once("/usr/bin/emacs --daemon")
-awful.spawn.once("xfce4-power-manager")
+awful.spawn.spawn("./bashscripts/toggle_monitors.sh")
+awful.spawn.spawn("compton")
+-- -- awful.spawn.spawn("nitrogen --restore")
+awful.spawn.spawn("nm-applet")
+awful.spawn.spawn("/usr/bin/gnome-keyring-daemon --start --components=ssh")
+awful.spawn.spawn("./bashscripts/startemacs.sh")
+awful.spawn.spawn("xfce4-power-manager")
 #+end_src

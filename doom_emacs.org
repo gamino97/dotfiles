@@ -23,6 +23,7 @@
   - [[#flycheck][Flycheck]]
   - [[#python-mode][Python mode]]
   - [[#evaluate-python-files][EVALUATE PYTHON FILES]]
+- [[#javascript][JAVASCRIPT]]
 - [[#completition][COMPLETITION]]
 - [[#indent-guide][INDENT GUIDE]]
 - [[#vterm][VTERM]]
@@ -41,6 +42,7 @@
 - [[#uniquify-buffer-names][UNIQUIFY BUFFER NAMES]]
 - [[#dotcrafter][DOTCRAFTER]]
   - [[#configurations][Configurations]]
+- [[#tailwind-css][TAILWIND CSS]]
 
 * Doom Emacs Configuration File
 Place your private configuration here! Remember, you do not need to run 'doom
@@ -271,7 +273,7 @@ This section configurates the flycheck package included in Emacs Python
   :hook (python-mode . flycheck-mode)
   :config
   (setq-default flycheck-disabled-checkers '(python-pylint))
-  (setq-default flycheck-enabled-checkers '(python-flake8))
+  (setq-default flycheck-enabled-checkers '(python-flake8 javascript-eslint))
   (setq-default flycheck-flake8-maximum-line-length 119)
   (setq-default flycheck-check-syntax-automatically '(mode-enabled save)))
 ;; (after! flycheck
@@ -312,8 +314,7 @@ This section configurates the python mode
 
 (use-package! lsp
   :config
-  (setq lsp-diagnostics-disabled-modes (list 'python-mode))
-  )
+  (setq lsp-diagnostics-disabled-modes (list 'python-mode)))
 #+end_src
 
 *** Check errors with Projectile
@@ -358,6 +359,37 @@ With this code we map that function to the original map function python-shell-se
 #+begin_src emacs-lisp
 (map! :map python-mode-map
       :desc "Send Python Buffer to Python Shell and print a final message" "C-c C-c" 'send-python-file)
+(map! :leader :desc "Format Buffer" :nvi "f b" '+format/buffer)
+#+end_src
+
+* JAVASCRIPT
+I use ESLINT, this is the configuration for .eslintrc file:
+{
+  env: {
+    browser: true,
+    es2021: true,
+  },
+  extends: ["eslint:recommended", "plugin:react/recommended"],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 12,
+    sourceType: "module",
+  },
+  plugins: ["react"],
+  rules: {
+        "no-console": "warn",
+        "import/first": "error"
+    "react/prop-types": 0,
+    "linebreak-style": ["error", "unix"]
+  },
+}
+
+How to install eslint with react:
+npm install eslint eslint-plugin-react lint-staged --save-dev
+#+begin_src emacs-lisp
+(setq-default js-indent-level 2)
 #+end_src
 
 * COMPLETITION
@@ -617,4 +649,10 @@ files begins.")
 #+begin_src emacs-lisp
 ;; (file-relative-name "./dotfiles/awesomewm/.config/awesome/rc.lua" dotfiles-folder)
 (customize-set-variable 'dotfiles-org-files '("awesome.org" "doom_emacs.org" "fish.org"))
+#+end_src
+
+* TAILWIND CSS
+LSP server for Tailwind CSS
+#+begin_src emacs-lisp
+(use-package! lsp-tailwindcss)
 #+end_src
