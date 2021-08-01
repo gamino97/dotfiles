@@ -1,0 +1,5 @@
+const ${1:`(f-base buffer-file-name)`} = (props) => {
+  $0
+};
+
+export default $1;

@@ -43,6 +43,8 @@
 - [[#dotcrafter][DOTCRAFTER]]
   - [[#configurations][Configurations]]
 - [[#tailwind-css][TAILWIND CSS]]
+- [[#ctags][CTAGS]]
+- [[#lsp-1][LSP]]
 
 * Doom Emacs Configuration File
 Place your private configuration here! Remember, you do not need to run 'doom
@@ -309,12 +311,12 @@ This section configurates the python mode
   (setq +format-with 'pep8)
   (display-fill-column-indicator-mode 't)
   (flycheck-select-checker 'python-flake8)
-  (setq lsp-modeline-diagnostics-enable nil) ;; Disable Modeline diagnostics statistics
+  ;; (setq lsp-modeline-diagnostics-enable nil) ;; Disable Modeline diagnostics statistics
   )
 
-(use-package! lsp
-  :config
-  (setq lsp-diagnostics-disabled-modes (list 'python-mode)))
+;; (use-package! lsp
+;;   :config
+;;   (setq lsp-diagnostics-disabled-modes (list 'python-mode)))
 #+end_src
 
 *** Check errors with Projectile
@@ -390,6 +392,14 @@ How to install eslint with react:
 npm install eslint eslint-plugin-react lint-staged --save-dev
 #+begin_src emacs-lisp
 (setq-default js-indent-level 2)
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package! rjsx-mode
+;;   :config
+;;   (set-company-backend! 'rjsx-mode '(:separate company-tide company-capf company-yasnippet)))
+(add-hook! tide-mode (lambda () (set-company-backend! tide-mode '(:separate company-tide company-capf company-yasnippet))))
+;; (add-hook! tide-mode (lambda () (setq-local company-backends '(:separate company-tide company-capf company-yasnippet))))
 #+end_src
 
 * COMPLETITION
@@ -655,4 +665,27 @@ files begins.")
 LSP server for Tailwind CSS
 #+begin_src emacs-lisp
 (use-package! lsp-tailwindcss)
+;; (add-hook! tide-mode (lambda ()
+;;                        (message "Vamo a ver")
+;;                        (if (s-matches-p (rx (and ".js" eol)) (buffer-file-name))
+;;                            (setq-local +lsp-company-backends
+;;                                        (if (featurep! :editor snippets)
+;;                                            '(:separate company-capf company-tide company-yasnippet)
+;;                                          'company-capf)))))
+#+end_src
+
+* CTAGS
+#+begin_src emacs-lisp
+;; (with-eval-after-load 'company
+;;   (company-ctags-auto-setup))
+#+end_src
+
+* LSP
+With this code, we fix the issue with LSP with company
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq +lsp-company-backends
+        (if (featurep! :editor snippets)
+            '(:separate company-capf company-yasnippet company-tide)
+          'company-capf)))
 #+end_src
