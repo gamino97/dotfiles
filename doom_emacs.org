@@ -272,7 +272,7 @@ This section configurates the flycheck package included in Emacs Python
 
 #+begin_src emacs-lisp
 (use-package! flycheck
-  :hook (python-mode . flycheck-mode)
+  :hook ((python-mode rjsx-mode) . flycheck-mode)
   :config
   (setq-default flycheck-disabled-checkers '(python-pylint))
   (setq-default flycheck-enabled-checkers '(python-flake8 javascript-eslint))
@@ -314,6 +314,10 @@ This section configurates the python mode
   ;; (setq lsp-modeline-diagnostics-enable nil) ;; Disable Modeline diagnostics statistics
   )
 
+;; (add-hook! lsp-mode
+;;   (flycheck-select-checker 'lsp)
+;;   (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled))
+;;   (setq flycheck-enabled-checkers '(lsp python-flake8 javascript-eslint)))
 ;; (use-package! lsp
 ;;   :config
 ;;   (setq lsp-diagnostics-disabled-modes (list 'python-mode)))
@@ -467,13 +471,11 @@ number of lines, etc.
 * TREE SITTER
 Activate Tree Sitter
 
-#+begin_src emacs-lisp
 (use-package! tree-sitter
   :config
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode)
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-#+end_src
 
 * ANACONDA
 Anaconda has an issue that opens too many servers, and doesn't work, this code solves the problem.
