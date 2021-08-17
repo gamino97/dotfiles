@@ -43,7 +43,8 @@ alias startemacsd='emacs --daemon'
 alias update='sudo apt update'
 alias install='sudo apt install'
 alias cdrest='cd ~/Documentos/restaurante_proyecto/restaurante/'
-alias cdfront='cd ~/Documentos/restaurante_proyecto/restaurante/apps/frontend/spa_project/'
+alias cdfront='cd ~/Documentos/restaurante_proyecto/nextjs_restaurante/'
+alias workon="vf activate"
 #+end_src
 
 * EXPORTS

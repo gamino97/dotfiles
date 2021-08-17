@@ -51,13 +51,13 @@
 
 (package! monokai-theme)
 (package! org-auto-tangle)
-(package! elfeed-goodies)
-;; (package! tree-sitter)
-;; (package! tree-sitter-langs)
+;; (package! elfeed-goodies)
+(package! tree-sitter)
+(package! tree-sitter-langs)
 (package! magit-section)
 (package! fish-mode)
 (add-load-path! "/home/gamino/python-django.el/")
 (package! counsel-dash) ;; This is from Dash docs in MAC
 (package! minions)
 (package! vdiff)
-(package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
+;; (package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))

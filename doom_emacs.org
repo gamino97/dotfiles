@@ -43,7 +43,6 @@
 - [[#dotcrafter][DOTCRAFTER]]
   - [[#configurations][Configurations]]
 - [[#tailwind-css][TAILWIND CSS]]
-- [[#ctags][CTAGS]]
 - [[#lsp-1][LSP]]
 
 * Doom Emacs Configuration File
@@ -272,7 +271,7 @@ This section configurates the flycheck package included in Emacs Python
 
 #+begin_src emacs-lisp
 (use-package! flycheck
-  :hook ((python-mode rjsx-mode) . flycheck-mode)
+  ;; :hook ((python-mode rjsx-mode) . flycheck-mode)
   :config
   (setq-default flycheck-disabled-checkers '(python-pylint))
   (setq-default flycheck-enabled-checkers '(python-flake8 javascript-eslint))
@@ -471,11 +470,13 @@ number of lines, etc.
 * TREE SITTER
 Activate Tree Sitter
 
+#+begin_src emacs-lisp
 (use-package! tree-sitter
   :config
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode)
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+#+end_src
 
 * ANACONDA
 Anaconda has an issue that opens too many servers, and doesn't work, this code solves the problem.
@@ -666,28 +667,15 @@ files begins.")
 * TAILWIND CSS
 LSP server for Tailwind CSS
 #+begin_src emacs-lisp
-(use-package! lsp-tailwindcss)
-;; (add-hook! tide-mode (lambda ()
-;;                        (message "Vamo a ver")
-;;                        (if (s-matches-p (rx (and ".js" eol)) (buffer-file-name))
-;;                            (setq-local +lsp-company-backends
-;;                                        (if (featurep! :editor snippets)
-;;                                            '(:separate company-capf company-tide company-yasnippet)
-;;                                          'company-capf)))))
-#+end_src
-
-* CTAGS
-#+begin_src emacs-lisp
-;; (with-eval-after-load 'company
-;;   (company-ctags-auto-setup))
+;; (use-package! lsp-tailwindcss)
 #+end_src
 
 * LSP
 With this code, we fix the issue with LSP with company
 #+begin_src emacs-lisp
-(after! lsp-mode
-  (setq +lsp-company-backends
-        (if (featurep! :editor snippets)
-            '(:separate company-capf company-yasnippet company-tide)
-          'company-capf)))
+;; (after! lsp-mode
+;;   (setq +lsp-company-backends
+;;         (if (featurep! :editor snippets)
+;;             '(:separate company-capf company-yasnippet company-tide)
+;;           'company-capf)))
 #+end_src
