@@ -933,7 +933,9 @@ awful.rules.rules = {
           "Wpa_gui",
           "pinentry",
           "veromix",
-          "xtightvncviewer"},
+          "xtightvncviewer",
+          "Matplotlib",
+        },
 
         name = {
           "Event Tester",  -- xev.
@@ -1071,6 +1073,6 @@ awful.spawn.spawn("compton")
 -- -- awful.spawn.spawn("nitrogen --restore")
 awful.spawn.spawn("nm-applet")
 awful.spawn.spawn("/usr/bin/gnome-keyring-daemon --start --components=ssh")
-awful.spawn.spawn("./bashscripts/startemacs.sh")
+-- awful.spawn.spawn("./bashscripts/startemacs.sh")
 awful.spawn.spawn("xfce4-power-manager")
 #+end_src

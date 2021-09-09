@@ -18,7 +18,6 @@
 - [[#formater][FORMATER]]
   - [[#python][Python]]
 - [[#python-configurations][PYTHON CONFIGURATIONS]]
-  - [[#django][DJANGO]]
   - [[#lsp][LSP]]
   - [[#flycheck][Flycheck]]
   - [[#python-mode][Python mode]]
@@ -44,6 +43,7 @@
   - [[#configurations][Configurations]]
 - [[#tailwind-css][TAILWIND CSS]]
 - [[#lsp-1][LSP]]
+- [[#flyspell][FLYSPELL]]
 
 * Doom Emacs Configuration File
 Place your private configuration here! Remember, you do not need to run 'doom
@@ -110,7 +110,7 @@ available. You can either set `doom-theme' or manually load a theme with the
 (add-to-list 'custom-theme-load-path "~/.doom.d/themes")
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-monokai-pro)
+(setq doom-theme (quote doom-monokai-pro))
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(fixed-pitch :family "FiraCode Nerd Font")
@@ -143,11 +143,11 @@ change `org-directory'. It must be set before org loads!
 #+begin_src emacs-lisp
 (after! org
   (setq org-directory "~/Documentos/org/")
+  (setq org-agenda-files '("~/Documentos/org/agenda.org"))
   (setq org-startup-folded 'overview)
   (setq org-log-done 'time))
 (add-hook! org-mode
     (display-line-numbers-mode -1)
-    (show-smartparens-mode 1)
     )
 #+end_src
 
@@ -219,8 +219,6 @@ In this secction, we add the folders projects, using:
 (projectile-add-known-project "PATH")
 
 #+begin_src emacs-lisp
-;;(projectile-add-known-project "~/Documentos/Hardware")
-;;(projectile-add-known-project "~/Documentos/Topicos Mapas")
 (use-package! projectile
   :config
   (projectile-register-project-type 'python '("manage.py")
@@ -228,8 +226,6 @@ In this secction, we add the folders projects, using:
 				    :compile "python manage.py shell"
 				    :test "npm test"
 				    :run "python manage.py runserver"))
-;; :config
-;; (projectile-add-known-project '("~/Documentos/Hardware/" "~/Documentos/Topicos Mapas" "~/Documentos/Tesis/")))
 #+end_src
 
 * FORMATER
@@ -241,13 +237,6 @@ This setting creates a formatter called pep8.
 
 * PYTHON CONFIGURATIONS
 Configuration for Python mode, flycheck, etc.
-
-** DJANGO
-
-#+begin_src emacs-lisp
-(add-to-list 'load-path "/home/gamino/python-django.el")
-(require 'python-django)
-#+end_src
 
 ** LSP
 
@@ -271,7 +260,7 @@ This section configurates the flycheck package included in Emacs Python
 
 #+begin_src emacs-lisp
 (use-package! flycheck
-  ;; :hook ((python-mode rjsx-mode) . flycheck-mode)
+  :hook ((python-mode rjsx-mode) . flycheck-mode)
   :config
   (setq-default flycheck-disabled-checkers '(python-pylint))
   (setq-default flycheck-enabled-checkers '(python-flake8 javascript-eslint))
@@ -295,8 +284,6 @@ This section disables flycheck for program modes.
 This section configurates the python mode
 
 #+begin_src emacs-lisp
-(defun enable2-flycheck-mode ()
-  (flycheck-mode 't))
 (defun restart-rainbow-delimiters ()
   (interactive)
   (rainbow-delimiters-mode -1)
@@ -306,12 +293,10 @@ This section configurates the python mode
   (show-smartparens-mode)
   (show-paren-mode -1)
   (restart-rainbow-delimiters)
-  ;; (enable2-flycheck-mode)
   (setq +format-with 'pep8)
-  (display-fill-column-indicator-mode 't)
   (flycheck-select-checker 'python-flake8)
-  ;; (setq lsp-modeline-diagnostics-enable nil) ;; Disable Modeline diagnostics statistics
-  )
+  (display-fill-column-indicator-mode)
+  (show-smartparens-mode 1))
 
 ;; (add-hook! lsp-mode
 ;;   (flycheck-select-checker 'lsp)
@@ -401,7 +386,9 @@ npm install eslint eslint-plugin-react lint-staged --save-dev
 ;; (use-package! rjsx-mode
 ;;   :config
 ;;   (set-company-backend! 'rjsx-mode '(:separate company-tide company-capf company-yasnippet)))
-(add-hook! tide-mode (lambda () (set-company-backend! tide-mode '(:separate company-tide company-capf company-yasnippet))))
+(add-hook! rjsx-mode (lambda () (set-company-backend! tide-mode '(:separate company-tide company-capf company-yasnippet))))
+(add-hook! rjsx-mode (lambda () (display-fill-column-indicator-mode 't)))
+(add-hook! rjsx-mode (show-smartparens-mode 't))
 ;; (add-hook! tide-mode (lambda () (setq-local company-backends '(:separate company-tide company-capf company-yasnippet))))
 #+end_src
 
@@ -409,7 +396,7 @@ npm install eslint eslint-plugin-react lint-staged --save-dev
 This configuration changes the time between a user types something and the autocompletition suggest a word.
 
 #+begin_src emacs-lisp
-(setq company-idle-delay 0.0
+(setq company-idle-delay 0.2
       company-minimum-prefix-length 2
       company-show-numbers 't)
 #+end_src
@@ -425,6 +412,7 @@ You can follow installation instructions on [[https://github.com/akermu/emacs-li
 
 #+begin_src emacs-lisp
 (use-package! vterm
+  :defer t
   :load-path  "~/emacs-libvterm/"
   :custom
   (vterm-shell "/usr/bin/fish")
@@ -472,6 +460,7 @@ Activate Tree Sitter
 
 #+begin_src emacs-lisp
 (use-package! tree-sitter
+  :defer t
   :config
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode)
@@ -522,6 +511,7 @@ Go to insert mode in Vterm
 
 #+begin_src emacs-lisp
 (use-package! lua-mode
+  :defer t
   :config
   (set-company-backend! 'lua-mode '(company-lua company-yasnippet company-files company-keywords company-capf company-dabbrev-code company-etags company-dabbrev))
   )
@@ -679,3 +669,9 @@ With this code, we fix the issue with LSP with company
 ;;             '(:separate company-capf company-yasnippet company-tide)
 ;;           'company-capf)))
 #+end_src
+
+* FLYSPELL
+#+begin_src emacs-lisp
+(setq ispell-dictionary "castellano")
+#+end_src
+

@@ -1,3 +1,12 @@
+#+TITLE: EMACS CONFIG
+#+PROPERTY: header-args:emacs-lisp :tangle ./dotfiles/emacs/.emacsscratch.d/init.el
+#+auto_tangle: t
+
+* EMACS CONFIGURATION FILE
+Here I will build my emacs configuration from scratch, I started at August 25th, 2021
+
+
+#+begin_src emacs-lisp
 ;; Disable the startup page
 (setq inhibit-startup-message t)
 
@@ -128,3 +137,4 @@
 (customize-set-variable 'load-prefer-newer t)
 (leaf org-auto-tangle
   :hook (org-mode-hook . org-auto-tangle-mode))
+#+end_src

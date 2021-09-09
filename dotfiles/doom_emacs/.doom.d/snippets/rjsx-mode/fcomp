@@ -1,3 +1,5 @@
-export default function ${1:`(f-base buffer-file-name)`} (props) {
-  $2
+const ${1:`(f-base buffer-file-name)`} = () => {
+  $0
 }
+
+export default $1;
