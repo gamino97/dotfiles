@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name:
+# uuid:
+# key: icons
+# condition: t
+# --
+import { ${1:`(current-kill 0)`} } from '@react-icons/all-files/gi/$1'
+$0
