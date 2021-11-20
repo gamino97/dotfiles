@@ -1,6 +1,6 @@
 #+TITLE: Rc Lua
 #+PROPERTY: header-args:lua :tangle ./dotfiles/awesomewm/.config/awesome/rc.lua
-#+auto_tangle: t
+
 
 * TABLE OF CONTENTS :toc:
 - [[#library-imports][LIBRARY IMPORTS]]
@@ -35,6 +35,11 @@ local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
+
+
+local lain          = require("lain")
+local freedesktop   = require("freedesktop")
+
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:

@@ -44,6 +44,9 @@
 - [[#tailwind-css][TAILWIND CSS]]
 - [[#lsp-1][LSP]]
 - [[#flyspell][FLYSPELL]]
+- [[#ligature][LIGATURE]]
+- [[#safe-local-variables][SAFE LOCAL VARIABLES]]
+- [[#prettier-mode][PRETTIER MODE]]
 
 * Doom Emacs Configuration File
 Place your private configuration here! Remember, you do not need to run 'doom
@@ -80,6 +83,7 @@ Additionally, you can use grep to filter the results
 
 #+begin_src emacs-lisp
 (setq doom-font (font-spec :family "Source Code Pro" :size 12))
+;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 12))
 ;; (after! doom-themes
 ;;   (setq doom-themes-enable-bold t
 ;;         doom-themes-enable-italic t))
@@ -101,6 +105,19 @@ https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
 ;; (use-package fira-code-mode
 ;;   :custom (fira-code-mode-disabled-ligatures '("[]" "x"))  ; ligatures you don't want
 ;;   :hook prog-mode)                                         ; mode to enable fira-code-mode in
+#+begin_src emacs-lisp
+(use-package! fira-code-mode
+  :hook prog-mode
+  :custom
+  (fira-code-mode-disabled-ligatures '("[]" "x" ":" "<*" "<~~")) ;; List of ligatures to turn off
+  ;; (fira-code-mode-enable-hex-literal nil)
+  :config
+  ;; (fira-code-mode-set-font)
+  (set-fontset-font t '(#Xe100 . #Xe14a) "Fira Code Symbol")
+  (set-fontset-font t '(#Xe14d . #Xe15f) "Fira Code Symbol")
+  (set-fontset-font t '(#Xe162 . #Xe16f) "Fira Code Symbol")
+  )
+#+end_src
 
 * THEME
 There are two ways to load a theme. Both assume the theme is installed and
@@ -116,7 +133,7 @@ available. You can either set `doom-theme' or manually load a theme with the
   '(fixed-pitch :family "FiraCode Nerd Font")
   )
 (custom-theme-set-faces! 'doom-monokai-pro
-  '(line-number :foreground "#555556")
+  '(line-number :foreground "#B8B8B8")
   '(sp-show-pair-match-face :background "#A6E22E" :foreground "#272822")
   '(tree-sitter-hl-face:method.call :inherit tree-sitter-hl-face:method)
   '(tree-sitter-hl-face:constant.builtin :inherit tree-sitter-hl-face:constant)
@@ -133,8 +150,10 @@ available. You can either set `doom-theme' or manually load a theme with the
 
 ** Transparency
 Set frame transparency
-;; (set-frame-parameter (selected-frame) 'alpha '(87 . 87))
-;; (add-to-list 'default-frame-alist '(alpha . (87 . 87)))
+#+begin_src emacs-lisp
+(set-frame-parameter (selected-frame) 'alpha '(87 . 87))
+(add-to-list 'default-frame-alist '(alpha . (87 . 87)))
+#+end_src
 
 * ORG
 If you use `org' and don't want your org files in the default location below,
@@ -142,9 +161,12 @@ change `org-directory'. It must be set before org loads!
 
 #+begin_src emacs-lisp
 (after! org
-  (setq org-directory "~/Documentos/org/")
-  (setq org-agenda-files '("~/Documentos/org/agenda.org"))
-  (setq org-startup-folded 'overview)
+  (setq org-directory "~/Documentos/org-files/")
+  (setq org-agenda-files '("~/Documentos/org-files/agenda.org"))
+  (setq org-startup-folded 'content)
+  (add-to-list 'org-structure-template-alist '("p" . "src python"))
+  (add-to-list 'org-structure-template-alist '("sq" . "src sql"))
+  (setq org-clock-sound 't)
   (setq org-log-done 'time))
 (add-hook! org-mode
     (display-line-numbers-mode -1)
@@ -154,10 +176,10 @@ change `org-directory'. It must be set before org loads!
 I don't want autocompletition in ORG mode
 
 #+begin_src emacs-lisp
-;; (defun zz/adjust-org-company-backends ()
-;;   (remove-hook 'after-change-major-mode-hook '+company-init-backends-h)
-;;   (setq-local company-backends nil))
-;; (add-hook! org-mode (zz/adjust-org-company-backends))
+(defun zz/adjust-org-company-backends ()
+  (remove-hook 'after-change-major-mode-hook '+company-init-backends-h)
+  (setq-local company-backends nil))
+(add-hook! org-mode (zz/adjust-org-company-backends))
 #+end_src
 
 This code is also great, it uses org-babel-tangle automatically when you put
@@ -166,15 +188,16 @@ in your org files.
 It requires the package org-auto-tangle
 
 #+begin_src emacs-lisp
-(require 'org-auto-tangle)
-(add-hook 'org-mode-hook 'org-auto-tangle-mode)
+(use-package! org-auto-tangle
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
 #+end_src
 
 ** Block templates
 Add <p for python expansion
 #+begin_src emacs-lisp
-(add-to-list 'org-structure-template-alist '("p" . "src python"))
-(add-to-list 'org-structure-template-alist '("sq" . "src sql"))
+;; (add-to-list 'org-structure-template-alist '("p" . "src python"))
+;; (add-to-list 'org-structure-template-alist '("sq" . "src sql"))
 #+end_src
 
 * MACROS
@@ -260,12 +283,12 @@ This section configurates the flycheck package included in Emacs Python
 
 #+begin_src emacs-lisp
 (use-package! flycheck
-  :hook ((python-mode rjsx-mode) . flycheck-mode)
+  ;; :hook ((python-mode rjsx-mode) . flycheck-mode)
   :config
-  (setq-default flycheck-disabled-checkers '(python-pylint))
-  (setq-default flycheck-enabled-checkers '(python-flake8 javascript-eslint))
-  (setq-default flycheck-flake8-maximum-line-length 119)
-  (setq-default flycheck-check-syntax-automatically '(mode-enabled save)))
+  ;; (setq-default flycheck-disabled-checkers '(python-pylint))
+  ;; (setq-default flycheck-enabled-checkers '(python-flake8 javascript-eslint))
+  (setq-default flycheck-flake8-maximum-line-length 119))
+  ;; (setq-default flycheck-check-syntax-automatically '(mode-enabled save)))
 ;; (after! flycheck
 ;;   (global-flycheck-mode -1))
 ;;(require 'flycheck)
@@ -276,8 +299,8 @@ This section disables flycheck for program modes.
 #+begin_src emacs-lisp
 (defun disable-flycheck-mode ()
   (flycheck-mode -1))
-(add-hook 'prog-mode-hook 'disable-flycheck-mode)
-(add-hook 'org-mode-hook 'disable-flycheck-mode)
+;; (add-hook 'prog-mode-hook 'disable-flycheck-mode)
+;; (add-hook 'org-mode-hook 'disable-flycheck-mode)
 #+end_src
 
 ** Python mode
@@ -290,11 +313,10 @@ This section configurates the python mode
   (rainbow-delimiters-mode 't))
 (add-hook! python-mode
   (setq python-shell-interpreter-args "-u -i")
-  (show-smartparens-mode)
   (show-paren-mode -1)
   (restart-rainbow-delimiters)
   (setq +format-with 'pep8)
-  (flycheck-select-checker 'python-flake8)
+  ;; (flycheck-select-checker 'python-flake8)
   (display-fill-column-indicator-mode)
   (show-smartparens-mode 1))
 
@@ -386,9 +408,18 @@ npm install eslint eslint-plugin-react lint-staged --save-dev
 ;; (use-package! rjsx-mode
 ;;   :config
 ;;   (set-company-backend! 'rjsx-mode '(:separate company-tide company-capf company-yasnippet)))
-(add-hook! rjsx-mode (lambda () (set-company-backend! tide-mode '(:separate company-tide company-capf company-yasnippet))))
+;; (add-hook! rjsx-mode (lambda () (set-company-backend! tide-mode '(:separate company-tide company-capf company-yasnippet))))
 (add-hook! rjsx-mode (lambda () (display-fill-column-indicator-mode 't)))
 (add-hook! rjsx-mode (show-smartparens-mode 't))
+(defun gm/tideflycheck ()
+  (when (and (stringp buffer-file-name)
+             (string-match "\\.jsx\\'" buffer-file-name))
+    (flycheck-select-checker 'jsx-tide)))
+(use-package! tide
+  :init
+  (add-hook! tide-mode :local #'gm/tideflycheck)
+  :config
+  (flycheck-add-next-checker 'jsx-tide 'javascript-eslint))
 ;; (add-hook! tide-mode (lambda () (setq-local company-backends '(:separate company-tide company-capf company-yasnippet))))
 #+end_src
 
@@ -413,15 +444,15 @@ You can follow installation instructions on [[https://github.com/akermu/emacs-li
 #+begin_src emacs-lisp
 (use-package! vterm
   :defer t
-  :load-path  "~/emacs-libvterm/"
+  :load-path  "~/Aplicaciones/emacs-libvterm/"
   :custom
-  (vterm-shell "/usr/bin/fish")
-  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
+  (vterm-shell "/usr/bin/fish"))
+  ;; (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=no"))
 
-(add-hook 'vterm-mode-hook
-          (lambda ()
-            (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
-                 (buffer-face-mode t)))
+;; (add-hook 'vterm-mode-hook
+;;           (lambda ()
+;;             (set (make-local-variable 'buffer-face-mode-face) 'fixed-pitch)
+;;                  (buffer-face-mode t)))
 #+end_src
 
 * HL COLUMN INDICATOR
@@ -460,10 +491,10 @@ Activate Tree Sitter
 
 #+begin_src emacs-lisp
 (use-package! tree-sitter
-  :defer t
-  :config
+  :init
   (require 'tree-sitter-langs)
   (global-tree-sitter-mode)
+  :config
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 #+end_src
 
@@ -490,7 +521,7 @@ Go to insert mode in Vterm
 * DOOM MODELINE
 #+begin_src emacs-lisp
 (setq doom-modeline-major-mode-icon t)
-(setq doom-modeline-modal-icon 'nil)
+;; (setq doom-modeline-modal-icon 'nil)
 #+end_src
 
 * Dash Docsets
@@ -657,12 +688,17 @@ files begins.")
 * TAILWIND CSS
 LSP server for Tailwind CSS
 #+begin_src emacs-lisp
-;; (use-package! lsp-tailwindcss)
+(use-package! lsp-tailwindcss)
 #+end_src
 
 * LSP
 With this code, we fix the issue with LSP with company
 #+begin_src emacs-lisp
+(defun gm/lsp-company ()
+  (setq +lsp-company-backends '(:separate company-tide company-capf company-yasnippet company-tabnine))
+  )
+(add-hook! lsp-mode #'gm/lsp-company)
+;; (remove-hook! lsp-mode #'gm/lsp-company)
 ;; (after! lsp-mode
 ;;   (setq +lsp-company-backends
 ;;         (if (featurep! :editor snippets)
@@ -675,3 +711,37 @@ With this code, we fix the issue with LSP with company
 (setq ispell-dictionary "castellano")
 #+end_src
 
+* LIGATURE
+#+begin_src emacs-lisp
+;; (use-package! ligature
+;;   :config
+;;   ;; Enable the "www" ligature in every possible major mode
+;;   (ligature-set-ligatures 't '("www"))
+;;   ;; Enable all Cascadia Code ligatures in programming modes
+;;   (ligature-set-ligatures 't '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\" "{-" "::"
+;;                                        ":::" ":=" "!!" "!=" "!==" "-}" "----" "-->" "->" "->>"
+;;                                        "-<" "-<<" "-~" "#{" "#[" "##" "###" "####" "#(" "#?" "#_"
+;;                                        "#_(" ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*" "/**"
+;;                                        "/=" "/==" "/>" "//" "///" "&&" "||" "||=" "|=" "|>" "^=" "$>"
+;;                                        "++" "+++" "+>" "=:=" "==" "===" "==>" "=>" "=>>" "<="
+;;                                        "=<<" "=/=" ">-" ">=" ">=>" ">>" ">>-" ">>=" ">>>" "<*"
+;;                                        "<*>" "<|" "<|>" "<$" "<$>" "<!--" "<-" "<--" "<->" "<+"
+;;                                        "<+>" "<=" "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<"
+;;                                        "<~" "<~~" "</" "</>" "~@" "~-" "~>" "~~" "~~>" "%%"))
+;;   ;; Enables ligature checks globally in all buffers. You can also do it
+;;   ;; per mode with `ligature-mode'.
+;;   (global-ligature-mode t))
+#+end_src
+
+* SAFE LOCAL VARIABLES
+#+begin_src emacs-lisp
+;; (customize-set-variable 'safe-local-variable-values '((prettier-mode . t)))
+(add-to-list 'safe-local-eval-forms '(prettier-mode t))
+#+end_src
+
+* PRETTIER MODE
+#+begin_src emacs-lisp
+;; (use-package! prettier
+;;   :defer t)
+;;   :hook (rjsx-mode . prettier-mode))
+#+end_src
