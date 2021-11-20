@@ -11,8 +11,7 @@
 ;; <leaf-install-code>
 (eval-and-compile
   (customize-set-variable
-   'package-archives '(("org" . "https://orgmode.org/elpa/")
-                       ("melpa" . "https://melpa.org/packages/")
+   'package-archives '(("melpa" . "https://melpa.org/packages/")
                        ("gnu" . "https://elpa.gnu.org/packages/")))
   (package-initialize)
   (unless (package-installed-p 'leaf)
@@ -110,21 +109,21 @@
 ;; those from community packages so it can be much easier than
 ;; finding and setting these variables yourself.
 (leaf no-littering
-  :config
-  
-
-  ;; no-littering doesn't set this by default so we must place
-  ;; auto save files in the same path as it uses for sessions
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-
-  ;; Saved customizations
-  ;; Emacs will save customizations into your
-  ;; init.el file by default. If you don't want that, you might want
-  ;; to store them in a sibling file or even in the etc/ directory:
-  (setq custom-file (no-littering-expand-etc-file-name "custom.el")))
-
+  :leaf-defer nil)
+;; no-littering doesn't set this by default so we must place
+;; auto save files in the same path as it uses for sessions
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+;; Saved customizations
+;; Emacs will save customizations into your
+;; init.el file by default. If you don't want that, you might want
+;; to store them in a sibling file or even in the etc/ directory:
+(setq custom-file (no-littering-expand-etc-file-name "custom.el"))
 (setq require-final-newline t)
 (customize-set-variable 'load-prefer-newer t)
 (leaf org-auto-tangle
   :hook (org-mode-hook . org-auto-tangle-mode))
+
+(leaf dired
+  :bind
+  ("-" . dired-up-directory))

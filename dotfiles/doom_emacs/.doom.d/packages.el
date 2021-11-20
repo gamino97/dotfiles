@@ -60,6 +60,18 @@
 (package! counsel-dash) ;; This is from Dash docs in MAC
 (package! minions)
 (package! vdiff)
+;; (package! ligature :recipe
+;;   (:host github
+;;    :repo "mickeynp/ligature.el"))
+(package! fira-code-mode)
+(package! prettier)
+
+(package! gitconfig-mode
+	  :recipe (:host github :repo "magit/git-modes"
+			 :files ("gitconfig-mode.el")))
+(package! gitignore-mode
+	  :recipe (:host github :repo "magit/git-modes"
+			 :files ("gitignore-mode.el")))
 ;;(package! yasnippet-radical-snippets)
 ;;   :recipe (:host github :repo "Xaldew/yasnippet-radical-snippets"))
-;; (package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
+(package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
